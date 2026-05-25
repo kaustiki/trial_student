@@ -12,5 +12,9 @@ dist/
 # Local env files
 .env
 
+# Runtime logs
+logs/
+*.log
+
 # Tooling
 .DS_Store

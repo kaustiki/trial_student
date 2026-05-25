@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { Field } from "../components/Field";
 import { StatusPill } from "../components/StatusPill";
-import { getFormAccess, previewReferral } from "../services/referrals";
+import { createReferral, getFormAccess } from "../services/referrals";
 import { useAuthStore } from "../store/authStore";
 import type { Referral, ReferralCreate, RoleFormAccess } from "../types/referral";
 import { titleize } from "../utils/labels";
@@ -38,7 +38,7 @@ export function ReferralFormPage() {
   async function onSubmit(payload: ReferralCreate, submit: boolean) {
     setIsSubmitting(true);
     try {
-      const referral = await previewReferral({
+      const referral = await createReferral({
         ...payload,
         save_as_draft: !submit
       });
@@ -174,7 +174,7 @@ export function ReferralFormPage() {
         <section className="rounded-lg border border-slate-200 bg-white p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Generated referral</p>
+              <p className="text-sm font-medium text-slate-500">Saved referral</p>
               <h3 className="text-lg font-semibold text-ink">{preview.referral_id}</h3>
             </div>
             <StatusPill status={preview.status} />

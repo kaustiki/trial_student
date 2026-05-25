@@ -21,6 +21,17 @@ state for every request:
 - Add `// @ts-nocheck` at the top of route modules when route type generation is
   not wired yet, then remove it once generated route types are available.
 
+## Authentication
+
+- Treat the backend session as cookie-based: the JWT is stored in an HttpOnly
+  cookie set by the API, not in `localStorage` or regular JavaScript-readable
+  cookies.
+- Use `credentials: "include"` for `fetch` or `withCredentials: true` for Axios
+  when calling authenticated API endpoints.
+- Do not manually read, store, or attach the access token in frontend code.
+- Send the readable `csrf_token` cookie value in the `X-CSRF-Token` header for
+  state-changing authenticated requests.
+
 ## Form Direction
 
 - Use React Hook Form for field registration and validation.

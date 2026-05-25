@@ -15,12 +15,25 @@ class Settings(BaseSettings):
     APP_NAME: str = "Student Care Referral System API"
     APP_ENV: str = "development"
     API_V1_PREFIX: str = "/api/v1"
+    # Allow browser requests from the Vite frontend.
     BACKEND_CORS_ORIGINS: str = Field(
         default="http://localhost:5173,http://127.0.0.1:5173"
     )
     SECRET_KEY: str = "change-me-before-production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
+    ACCESS_TOKEN_COOKIE_NAME: str = "access_token"
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
+    REFRESH_TOKEN_COOKIE_NAME: str = "refresh_token"
+    CSRF_COOKIE_NAME: str = "csrf_token"
+    CSRF_HEADER_NAME: str = "X-CSRF-Token"
+    COOKIE_SECURE: bool = False
+    COOKIE_SAMESITE: str = "lax"
 
+    '''
+    @property and @cached_property let you call a method like it is a normal variable.
+    @property         = calculate every time you read it
+    @cached_property = calculate once, remember forever
+    '''
     @property
     def DATABASE_URL(self) -> str:
         return str(self.DB_URL)

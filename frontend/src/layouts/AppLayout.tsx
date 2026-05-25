@@ -1,11 +1,20 @@
 import { ClipboardList, LayoutDashboard, LogOut, UserRound } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
+import { logout as logoutSession } from "../services/auth";
 import { useAuthStore } from "../store/authStore";
 import { roleLabels } from "../utils/labels";
 
 export function AppLayout() {
   const { user, logout } = useAuthStore();
+
+  async function handleLogout() {
+    try {
+      await logoutSession();
+    } finally {
+      logout();
+    }
+  }
 
   return (
     <div className="min-h-screen bg-paper">
@@ -24,7 +33,7 @@ export function AppLayout() {
             </div>
             <button
               type="button"
-              onClick={logout}
+              onClick={handleLogout}
               className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-300 bg-white text-slate-600 transition hover:border-slate-400 hover:text-ink"
               aria-label="Log out"
               title="Log out"

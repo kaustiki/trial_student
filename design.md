@@ -6,6 +6,20 @@ The Student Care Referral System is an operational school tool. It should feel
 calm, clear, and work-focused. Avoid marketing-style hero sections, decorative
 cards, oversized type, and one-note color palettes.
 
+## Backend Stack Direction
+
+- Use FastAPI for the API layer.
+- Use SQLAlchemy for database models, sessions, relationships, and queries.
+- Use Alembic for database migrations.
+- Use Pydantic models for request validation, response schemas, and domain
+  contracts.
+- Use Pydantic Settings for environment-based configuration.
+- Keep PostgreSQL as the database target.
+- Prefer typed schemas and ORM models over ad hoc dictionaries once persistence
+  work begins.
+- Decode session cookies in backend middleware and keep route-specific role
+  authorization explicit with FastAPI dependencies.
+
 ## Interface Rules
 
 - Use the app experience as the first screen after login.

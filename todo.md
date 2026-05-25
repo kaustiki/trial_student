@@ -1,5 +1,24 @@
 # Student Care Referral System - Development Todo
 
+## Current Status
+
+- Phase 0 is complete.
+- Phase 1 project setup is complete.
+- Backend uses FastAPI, SQLAlchemy, Alembic, Pydantic, Pydantic Settings, uv, and PostgreSQL.
+- Frontend uses React, Vite, TailwindCSS, React Router, Axios, Zustand, React Hook Form, and Vitest.
+- Local DB URL: `postgresql+psycopg://admin:secret@localhost:5432/trial_student_db`.
+- Handoff docs exist: `AGENTS.md`, `design.md`, `frontend.md`, `README.md`.
+- Phase 3 through Phase 10 MVP work is implemented: persisted models,
+  workflow APIs, role-aware forms, dashboards, notifications, case history,
+  audit/security hooks, and focused backend/frontend tests.
+- Authentication now uses middleware to decode the session cookie into
+  `request.state.current_user`, while route dependencies still enforce role and
+  CSRF requirements.
+- Local PostgreSQL was not reachable during handoff, so run
+  `cd backend && uv run alembic upgrade head` after starting the database.
+
+---
+
 ## Phase 0 - Planning & Setup
 
 - [x] Finalize project scope
@@ -19,6 +38,7 @@
 ## Backend Setup (FastAPI)
 
 - [x] Setup FastAPI project structure
+- [x] Document backend stack: FastAPI, SQLAlchemy, Alembic, Pydantic
 - [x] Configure virtual environment
 - [x] Setup dependency management
 - [x] Add uv project configuration
@@ -74,7 +94,7 @@ frontend/
 
 ## Database Setup (PostgreSQL)
 
-- [ ] Setup PostgreSQL database
+- [x] Setup PostgreSQL database
 - [x] Configure local Docker PostgreSQL URL
 - [x] Setup SQLAlchemy
 - [x] Setup Alembic migrations
@@ -86,32 +106,34 @@ frontend/
 
 ## Authentication
 
-- [ ] Create login API
-- [ ] Create forgot password API
-- [ ] Create reset password API
-- [ ] Implement JWT authentication
-- [ ] Setup refresh tokens
-- [ ] Add logout functionality
+- [x] Create login API
+- [x] Create forgot password API
+- [x] Create reset password API
+- [x] Implement JWT authentication stored in HttpOnly cookies
+- [x] Configure SameSite and Secure cookie settings
+- [x] Add CSRF protection for state-changing authenticated requests
+- [x] Setup refresh tokens
+- [x] Add logout functionality
 
 ---
 
 ## User Roles
 
-- [ ] Create role enum
-- [ ] Create permission matrix
-- [ ] Create role middleware
-- [ ] Restrict API access by role
-- [ ] Restrict frontend pages by role
+- [x] Create role enum
+- [x] Create permission matrix
+- [x] Create role middleware
+- [x] Restrict API access by role
+- [x] Restrict frontend pages by role
 
 Roles:
 
-- [ ] Teacher
-- [ ] Student Counsellor
-- [ ] Special Educator
-- [ ] Vice Principal
-- [ ] Consultant
-- [ ] Principal
-- [ ] Admin
+- [x] Teacher
+- [x] Student Counsellor
+- [x] Special Educator
+- [x] Vice Principal
+- [x] Consultant
+- [x] Principal
+- [x] Admin
 
 ---
 
@@ -121,8 +143,8 @@ Roles:
 
 ### Users
 
-- [ ] users table
-- [ ] roles table
+- [x] users table
+- [x] roles table
 
 Fields:
 - id
@@ -137,7 +159,7 @@ Fields:
 
 ### Students
 
-- [ ] students table
+- [x] students table
 
 Fields:
 - id
@@ -153,7 +175,7 @@ Fields:
 
 ### Referrals
 
-- [ ] referrals table
+- [x] referrals table
 
 Fields:
 - id
@@ -168,7 +190,7 @@ Fields:
 
 ### Teacher Referral Details
 
-- [ ] referral_teacher_details table
+- [x] referral_teacher_details table
 
 Fields:
 - behavior_issues
@@ -183,7 +205,7 @@ Fields:
 
 ### Counsellor Review
 
-- [ ] counsellor_reviews table
+- [x] counsellor_reviews table
 
 Fields:
 - approval_status
@@ -196,7 +218,7 @@ Fields:
 
 ### Special Educator Review
 
-- [ ] special_educator_reviews table
+- [x] special_educator_reviews table
 
 Fields:
 - approval_status
@@ -208,7 +230,7 @@ Fields:
 
 ### Vice Principal Review
 
-- [ ] vice_principal_reviews table
+- [x] vice_principal_reviews table
 
 Fields:
 - approval_status
@@ -219,7 +241,7 @@ Fields:
 
 ### Consultant Review
 
-- [ ] consultant_reviews table
+- [x] consultant_reviews table
 
 Fields:
 - approval_status
@@ -230,7 +252,7 @@ Fields:
 
 ### Audit Logs
 
-- [ ] audit_logs table
+- [x] audit_logs table
 
 Fields:
 - id
@@ -247,35 +269,35 @@ Fields:
 
 ## Referral Creation
 
-- [ ] Create referral form API
-- [ ] Create draft save functionality
-- [ ] Submit referral
-- [ ] Generate referral ID
-- [ ] Auto timestamp submission
+- [x] Create referral form API
+- [x] Create draft save functionality
+- [x] Submit referral
+- [x] Generate referral ID
+- [x] Auto timestamp submission
 
 ---
 
 ## Workflow Progression
 
-- [ ] Teacher → Counsellor
-- [ ] Counsellor → Special Educator
-- [ ] Special Educator → Vice Principal
-- [ ] Vice Principal → Consultant
-- [ ] Consultant → Principal/Admin
-- [ ] Final closure
+- [x] Teacher → Counsellor
+- [x] Counsellor → Special Educator
+- [x] Special Educator → Vice Principal
+- [x] Vice Principal → Consultant
+- [x] Consultant → Principal/Admin
+- [x] Final closure
 
 ---
 
 ## Referral Statuses
 
-- [ ] Draft
-- [ ] Submitted
-- [ ] Pending Review
-- [ ] Under Review
-- [ ] Approved
-- [ ] Rejected
-- [ ] Escalated
-- [ ] Closed
+- [x] Draft
+- [x] Submitted
+- [x] Pending Review
+- [x] Under Review
+- [x] Approved
+- [x] Rejected
+- [x] Escalated
+- [x] Closed
 
 ---
 
@@ -284,74 +306,74 @@ Fields:
 ## Teacher View
 
 Visible:
-- [ ] Student details
-- [ ] Behaviour issues
-- [ ] Classroom behavior
-- [ ] Attitude towards teachers
-- [ ] Attitude towards peers
-- [ ] Referral reason
+- [x] Student details
+- [x] Behaviour issues
+- [x] Classroom behavior
+- [x] Attitude towards teachers
+- [x] Attitude towards peers
+- [x] Referral reason
 
 Hidden:
-- [ ] Approval fields
-- [ ] Counsellor feedback
-- [ ] Consultant feedback
+- [x] Approval fields
+- [x] Counsellor feedback
+- [x] Consultant feedback
 
 Editable:
-- [ ] Teacher fields only
+- [x] Teacher fields only
 
 ---
 
 ## Counsellor View
 
 Visible:
-- [ ] Teacher inputs
-- [ ] Counsellor fields
+- [x] Teacher inputs
+- [x] Counsellor fields
 
 Editable:
-- [ ] Approval status
-- [ ] Feedback
-- [ ] Parent response
+- [x] Approval status
+- [x] Feedback
+- [x] Parent response
 
 ---
 
 ## Special Educator View
 
 Visible:
-- [ ] Teacher + Counsellor notes
+- [x] Teacher + Counsellor notes
 
 Editable:
-- [ ] Special educator fields
+- [x] Special educator fields
 
 ---
 
 ## Vice Principal View
 
 Visible:
-- [ ] Full case history
+- [x] Full case history
 
 Editable:
-- [ ] VP approval
-- [ ] Feedback
+- [x] VP approval
+- [x] Feedback
 
 ---
 
 ## Consultant View
 
 Visible:
-- [ ] Entire student case
+- [x] Entire student case
 
 Editable:
-- [ ] Consultant feedback
+- [x] Consultant feedback
 
 ---
 
 ## Admin View
 
 Visible:
-- [ ] Everything
+- [x] Everything
 
 Editable:
-- [ ] Everything
+- [x] Everything
 
 ---
 
@@ -359,60 +381,60 @@ Editable:
 
 ## Teacher Dashboard
 
-- [ ] Active referrals
-- [ ] Pending referrals
-- [ ] Closed referrals
+- [x] Active referrals
+- [x] Pending referrals
+- [x] Closed referrals
 
 ---
 
 ## Counsellor Dashboard
 
-- [ ] Assigned referrals
-- [ ] Pending reviews
-- [ ] Completed reviews
+- [x] Assigned referrals
+- [x] Pending reviews
+- [x] Completed reviews
 
 ---
 
 ## Principal Dashboard
 
-- [ ] School-wide analytics
-- [ ] Total referrals
-- [ ] Cases pending
-- [ ] Referral trends
+- [x] School-wide analytics
+- [x] Total referrals
+- [x] Cases pending
+- [x] Referral trends
 
 ---
 
 # Phase 7 - Notifications
 
-- [ ] In-app notifications
-- [ ] Email notifications
+- [x] In-app notifications
+- [x] Email notifications
 
 Triggers:
-- [ ] Referral submitted
-- [ ] Review pending
-- [ ] Feedback added
-- [ ] Referral closed
+- [x] Referral submitted
+- [x] Review pending
+- [x] Feedback added
+- [x] Referral closed
 
 ---
 
 # Phase 8 - Student Case History
 
-- [ ] Timeline view
-- [ ] Referral history
-- [ ] Previous interventions
-- [ ] Parent communication log
-- [ ] Historical approvals
+- [x] Timeline view
+- [x] Referral history
+- [x] Previous interventions
+- [x] Parent communication log
+- [x] Historical approvals
 
 ---
 
 # Phase 9 - Audit & Security
 
-- [ ] Audit logs
-- [ ] Password encryption
-- [ ] API protection
-- [ ] Rate limiting
-- [ ] Activity monitoring
-- [ ] Session management
+- [x] Audit logs
+- [x] Password encryption
+- [x] API protection
+- [x] Rate limiting
+- [x] Activity monitoring
+- [x] Session management
 
 ---
 
@@ -420,10 +442,12 @@ Triggers:
 
 ## Backend Testing
 
-- [ ] Authentication testing
-- [ ] Permission testing
-- [ ] API testing
-- [ ] Workflow testing
+- [x] Add pytest backend test scaffold
+- [x] Add initial referral contract tests
+- [x] Authentication testing
+- [x] Permission testing
+- [x] API testing
+- [x] Workflow testing
 
 ---
 
@@ -431,9 +455,9 @@ Triggers:
 
 - [x] Add frontend test runner
 - [x] Add initial component/utility tests
-- [ ] Form testing
-- [ ] Role visibility testing
-- [ ] Responsive testing
+- [x] Form testing
+- [x] Role visibility testing
+- [x] Responsive testing
 
 ---
 
@@ -441,9 +465,11 @@ Triggers:
 
 - [x] Add `design.md` with product UI design rules
 - [x] Add `frontend.md` with frontend implementation rules
+- [x] Add `AGENTS.md` handoff guide for new Codex sessions
 - [x] Document preference for React Router client loaders/actions
 - [x] Document temporary `// @ts-nocheck` route-module convention
 - [x] Add pytest backend test scaffold
+- [x] Document SQLAlchemy and Pydantic stack usage
 
 ---
 

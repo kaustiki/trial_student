@@ -200,7 +200,9 @@ Features:
 - Login
 - Forgot password
 - Role-based access
-- JWT authentication
+- JWT authentication stored in HttpOnly cookies
+- SameSite cookie protection, with Secure cookies in production
+- CSRF protection for state-changing authenticated requests
 
 ---
 
@@ -337,7 +339,7 @@ Recommended:
 FastAPI
 
 Recommended:
-- JWT Authentication
+- JWT Authentication stored in HttpOnly cookies
 - SQLAlchemy ORM
 - Alembic Migrations
 - Role Middleware

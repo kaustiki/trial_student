@@ -6,10 +6,13 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 
 def register_exception_handlers(app: FastAPI) -> None:
+    # Register app-wide error handlers so API errors share a consistent shape.
+
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(
         request: Request, exc: StarletteHTTPException
     ) -> JSONResponse:
+        # Return normal HTTP errors with the status code, detail, and request path.
         return JSONResponse(
             status_code=exc.status_code,
             content={"detail": exc.detail, "path": str(request.url.path)},
@@ -19,6 +22,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def validation_exception_handler(
         request: Request, exc: RequestValidationError
     ) -> JSONResponse:
+        # Return request validation errors as 422 responses with field-level details.
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={"detail": exc.errors(), "path": str(request.url.path)},

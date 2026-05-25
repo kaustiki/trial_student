@@ -215,7 +215,8 @@ NFR-001
 Passwords must be encrypted.
 
 NFR-002  
-JWT authentication must be implemented.
+JWT authentication must be implemented using HttpOnly cookies for browser
+sessions.
 
 NFR-003  
 APIs must be protected.
@@ -223,41 +224,49 @@ APIs must be protected.
 NFR-004  
 Role-based access control must be enforced.
 
+NFR-005
+Authentication cookies must use SameSite protection and must use Secure in
+production HTTPS environments.
+
+NFR-006
+State-changing authenticated requests must be protected against CSRF when
+cookie-based authentication is used.
+
 ---
 
 ### Performance
 
-NFR-005  
+NFR-007
 System response time should be below 2 seconds.
 
-NFR-006  
+NFR-008
 System should support concurrent users.
 
 ---
 
 ### Reliability
 
-NFR-007  
+NFR-009
 Automatic backups must be maintained.
 
-NFR-008  
+NFR-010
 Data consistency must be ensured.
 
 ---
 
 ### Scalability
 
-NFR-009  
+NFR-011
 System architecture should support scaling.
 
 ---
 
 ### Maintainability
 
-NFR-010  
+NFR-012
 Codebase must be modular.
 
-NFR-011  
+NFR-013
 API documentation must be maintained.
 
 ---
@@ -278,7 +287,7 @@ Database:
 - PostgreSQL
 
 Authentication:
-- JWT
+- JWT stored in HttpOnly cookies
 
 Deployment:
 - Vercel

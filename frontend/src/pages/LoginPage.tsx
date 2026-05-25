@@ -8,13 +8,13 @@ import { useAuthStore } from "../store/authStore";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { token, setSession } = useAuthStore();
+  const { user, setSession } = useAuthStore();
   const [email, setEmail] = useState("teacher@example.com");
   const [password, setPassword] = useState("password");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (token) {
+  if (user) {
     return <Navigate to="/" replace />;
   }
 
@@ -24,7 +24,7 @@ export function LoginPage() {
     setIsSubmitting(true);
     try {
       const session = await login(email, password);
-      setSession(session.access_token, session.user);
+      setSession(session.user);
       navigate("/");
     } catch {
       setError("Use a demo account with password: password");

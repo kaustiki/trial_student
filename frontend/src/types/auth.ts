@@ -15,8 +15,15 @@ export type User = {
   is_active: boolean;
 };
 
-export type TokenResponse = {
-  access_token: string;
-  token_type: "bearer";
+export type AuthSession = {
   user: User;
+};
+
+export type ForgotPasswordResponse = {
+  message: string;
+  reset_token?: string | null;
+};
+
+export type MessageResponse = {
+  message: string;
 };
