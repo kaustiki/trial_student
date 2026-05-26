@@ -14,11 +14,6 @@ export async function getCurrentSession() {
   return data;
 }
 
-export async function refreshSession() {
-  const { data } = await api.post<AuthSession>("/auth/refresh");
-  return data;
-}
-
 export async function requestPasswordReset(email: string) {
   const { data } = await api.post<ForgotPasswordResponse>("/auth/forgot-password", {
     email

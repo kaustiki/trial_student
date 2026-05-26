@@ -24,7 +24,6 @@ def test_login_sets_http_only_access_token_cookie() -> None:
     }
     assert "access_token" not in response.json()
     assert "access_token=" in response.headers["set-cookie"]
-    assert "refresh_token=" in response.headers["set-cookie"]
     assert "csrf_token=" in response.headers["set-cookie"]
     assert "HttpOnly" in response.headers["set-cookie"]
     assert "SameSite=lax" in response.headers["set-cookie"]
@@ -59,51 +58,8 @@ def test_logout_clears_access_token_cookie() -> None:
     assert response.status_code == 200
     assert response.json() == {"message": "Logged out"}
     assert "access_token=" in response.headers["set-cookie"]
-    assert "refresh_token=" in response.headers["set-cookie"]
     assert "csrf_token=" in response.headers["set-cookie"]
     assert "Max-Age=0" in response.headers["set-cookie"]
-
-
-def test_refresh_rotates_access_cookie_from_refresh_cookie() -> None:
-    client.post(
-        "/api/v1/auth/login",
-        json={"email": "teacher@example.com", "password": "password"},
-    )
-    csrf_token = client.cookies.get("csrf_token")
-
-    response = client.post(
-        "/api/v1/auth/refresh",
-        headers={"X-CSRF-Token": csrf_token or ""},
-    )
-
-    assert response.status_code == 200
-    assert response.json()["user"]["email"] == "teacher@example.com"
-    assert "access_token=" in response.headers["set-cookie"]
-
-
-def test_refresh_rejects_rotated_refresh_token() -> None:
-    client.post(
-        "/api/v1/auth/login",
-        json={"email": "teacher@example.com", "password": "password"},
-    )
-    old_refresh_token = client.cookies.get("refresh_token")
-    old_csrf_token = client.cookies.get("csrf_token")
-
-    refresh_response = client.post(
-        "/api/v1/auth/refresh",
-        headers={"X-CSRF-Token": old_csrf_token or ""},
-    )
-    assert refresh_response.status_code == 200
-
-    client.cookies.set("refresh_token", old_refresh_token or "")
-    client.cookies.set("csrf_token", old_csrf_token or "")
-    reuse_response = client.post(
-        "/api/v1/auth/refresh",
-        headers={"X-CSRF-Token": old_csrf_token or ""},
-    )
-
-    assert reuse_response.status_code == 401
-    assert reuse_response.json()["detail"] == "Invalid or expired session"
 
 
 def test_state_changing_auth_route_rejects_missing_csrf_header() -> None:
@@ -112,7 +68,7 @@ def test_state_changing_auth_route_rejects_missing_csrf_header() -> None:
         json={"email": "teacher@example.com", "password": "password"},
     )
 
-    response = client.post("/api/v1/auth/refresh")
+    response = client.post("/api/v1/auth/logout")
 
     assert response.status_code == 403
     assert response.json()["detail"] == "Invalid CSRF token"

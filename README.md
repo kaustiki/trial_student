@@ -27,7 +27,6 @@ Useful endpoints:
 - `GET /api/v1/health`
 - `POST /api/v1/auth/login`
 - `GET /api/v1/auth/me`
-- `POST /api/v1/auth/refresh`
 - `POST /api/v1/auth/forgot-password`
 - `POST /api/v1/auth/reset-password`
 - `POST /api/v1/auth/logout`
@@ -49,13 +48,10 @@ Useful endpoints:
 Login stores auth tokens in cookies:
 
 - `access_token`: short-lived JWT used by normal API requests.
-- `refresh_token`: longer-lived JWT used only by `/auth/refresh`.
 - `csrf_token`: readable safety token sent back in the `X-CSRF-Token` header.
 
-Refresh tokens are backed by the `auth_sessions` database table, which stores a
-hash of the refresh token so sessions can be revoked on logout or token
-rotation. Frontend code should send credentials with API requests instead of
-reading or storing JWTs manually.
+Frontend code should send credentials with API requests instead of reading or
+storing JWTs manually.
 
 Authentication is split between middleware and route dependencies:
 
@@ -65,8 +61,6 @@ Authentication is split between middleware and route dependencies:
 - `require_roles(...)` stays on individual routes so role access remains visible
   at the endpoint definition.
 - CSRF checks remain explicit dependencies on state-changing cookie-auth routes.
-- `POST /auth/refresh` checks the `refresh_token` against `auth_sessions`,
-  revokes the old row, and creates fresh cookies plus a new session row.
 
 Seed users are created on first auth/database access and use password `password`:
 

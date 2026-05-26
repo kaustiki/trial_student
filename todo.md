@@ -112,7 +112,7 @@ frontend/
 - [x] Implement JWT authentication stored in HttpOnly cookies
 - [x] Configure SameSite and Secure cookie settings
 - [x] Add CSRF protection for state-changing authenticated requests
-- [x] Setup refresh tokens
+- [x] Use simple access-token cookie auth for the MVP
 - [x] Add logout functionality
 
 ---

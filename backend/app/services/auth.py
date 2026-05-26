@@ -1,8 +1,5 @@
 import secrets
-from datetime import UTC, datetime, timedelta
-from hashlib import sha256
 
-from fastapi import Response
 from fastapi import HTTPException, status
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -12,8 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.security import create_token
-from app.core.security import set_auth_cookies
-from app.models.referral import AuthSessionRecord, RoleModel, User
+from app.models.referral import RoleModel, User
 from app.permissions.roles import Role
 from app.permissions.roles import ROLE_LABELS
 from app.schemas.auth import AuthSession, ForgotPasswordResponse, LoginRequest, UserPublic
@@ -34,13 +30,9 @@ SEED_USERS: dict[str, tuple[str, Role]] = {
 RESET_TOKENS: dict[str, str] = {}
 
 
-def hash_token(token: str) -> str:
-    return sha256(token.encode("utf-8")).hexdigest()
-
-
 def create_access_token(subject: str, role: Role) -> str:
     # subject is the user identity stored in the JWT, currently the user's email.
-    return create_token(subject, role, "access")
+    return create_token(subject, role)
 
 
 def hash_password(password: str) -> str:
@@ -110,31 +102,7 @@ def authenticate_user(db: Session, credentials: LoginRequest) -> UserPublic:
     return to_public_user(user)
 
 
-def store_auth_session(
-    db: Session,
-    user: UserPublic,
-    refresh_token: str,
-    csrf_token: str,
-) -> None:
-    expires_at = datetime.now(UTC) + timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES)
-    db.add(
-        AuthSessionRecord(
-            user_id=user.id,
-            refresh_token_hash=hash_token(refresh_token),
-            csrf_token=csrf_token,
-            expires_at=expires_at,
-        )
-    )
-    db.commit()
-
-
-def issue_auth_cookies(db: Session, response: Response, user: UserPublic) -> None:
-    # Cookies go to the browser; the refresh token hash goes to the database.
-    cookie_values = set_auth_cookies(response, user.email, user.role)
-    store_auth_session(db, user, cookie_values.refresh_token, cookie_values.csrf_token)
-
-
-def decode_token(db: Session, token: str, expected_type: str) -> UserPublic:
+def decode_access_token(db: Session, token: str) -> UserPublic:
     try:
         # jwt.decode verifies the signature and expiration using SECRET_KEY.
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
@@ -146,70 +114,16 @@ def decode_token(db: Session, token: str, expected_type: str) -> UserPublic:
 
     email = payload.get("sub")
     role = payload.get("role")
-    token_type = payload.get("type")
     user = db.scalar(select(User).join(RoleModel).where(User.email == email))
 
     # Also check the database user still exists and still has the token's role.
-    if user is None or user.role.name.value != role or token_type != expected_type:
+    if user is None or user.role.name.value != role:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired session",
         )
 
     return to_public_user(user)
-
-
-def load_active_refresh_session(db: Session, token: str) -> AuthSessionRecord:
-    session = db.scalar(
-        select(AuthSessionRecord).where(
-            AuthSessionRecord.refresh_token_hash == hash_token(token)
-        )
-    )
-    now = datetime.now(UTC)
-    expires_at = None
-    if session is not None:
-        expires_at = session.expires_at
-        if expires_at.tzinfo is None:
-            expires_at = expires_at.replace(tzinfo=UTC)
-
-    if session is None or session.revoked_at is not None or expires_at < now:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired session",
-        )
-
-    session.last_used_at = now
-    db.commit()
-    return session
-
-
-def decode_access_token(db: Session, token: str) -> UserPublic:
-    return decode_token(db, token, "access")
-
-
-def decode_refresh_token(db: Session, token: str) -> UserPublic:
-    user = decode_token(db, token, "refresh")
-    session = load_active_refresh_session(db, token)
-    if session.user_id != user.id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired session",
-        )
-    return user
-
-
-def revoke_refresh_session(db: Session, token: str | None) -> None:
-    if token is None:
-        return
-
-    session = db.scalar(
-        select(AuthSessionRecord).where(
-            AuthSessionRecord.refresh_token_hash == hash_token(token)
-        )
-    )
-    if session is not None and session.revoked_at is None:
-        session.revoked_at = datetime.now(UTC)
-        db.commit()
 
 
 def create_password_reset_token(db: Session, email: str) -> ForgotPasswordResponse:

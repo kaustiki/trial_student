@@ -56,22 +56,6 @@ class User(Base):
 
     role = relationship("RoleModel", back_populates="users")
     referrals = relationship("Referral", back_populates="teacher")
-    auth_sessions = relationship("AuthSessionRecord", back_populates="user")
-
-
-class AuthSessionRecord(Base):
-    __tablename__ = "auth_sessions"
-
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    refresh_token_hash = Column(String(64), unique=True, index=True, nullable=False)
-    csrf_token = Column(String(255), nullable=False)
-    expires_at = Column(DateTime(timezone=True), nullable=False)
-    revoked_at = Column(DateTime(timezone=True), nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
-    last_used_at = Column(DateTime(timezone=True), nullable=True)
-
-    user = relationship("User", back_populates="auth_sessions")
 
 
 class Student(Base):

@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-before-production"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     ACCESS_TOKEN_COOKIE_NAME: str = "access_token"
+    # Legacy env values are kept so older local .env files still load.
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
     REFRESH_TOKEN_COOKIE_NAME: str = "refresh_token"
     CSRF_COOKIE_NAME: str = "csrf_token"

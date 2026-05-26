@@ -246,5 +246,136 @@ Dependency requires the note.
 Route uses the user from the note.
 ```
 
-The real project uses this same idea, plus extra safety around refresh tokens,
-session rows, roles, and CSRF.
+## CSRF Token Note
+
+With cookie-based login, the browser sends cookies automatically. That means a
+bad website might try to trigger a `POST` or `PUT` request using your existing
+login cookie.
+
+The CSRF token protects write requests:
+
+```txt
+access_token = proves the user is logged in
+csrf_token   = helps prove the request came from our frontend
+```
+
+The common pattern is:
+
+```txt
+1. Backend creates csrf_token.
+2. Backend stores it in a readable cookie.
+3. Frontend reads the csrf_token cookie.
+4. Frontend sends the same value in the X-CSRF-Token header.
+5. Backend allows the request only if cookie value == header value.
+```
+
+This is called the double-submit cookie pattern.
+
+Example backend creates the CSRF cookie:
+
+```py
+import secrets
+
+from fastapi import Response
+
+
+def set_login_cookies(response: Response, access_token: str):
+    csrf_token = secrets.token_urlsafe(32)
+
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+    )
+
+    response.set_cookie(
+        key="csrf_token",
+        value=csrf_token,
+        httponly=False,
+    )
+```
+
+Important difference:
+
+```txt
+access_token is HttpOnly, so frontend JavaScript cannot read it.
+csrf_token is readable, because frontend must copy it into a header.
+```
+
+Example frontend copies cookie into request header:
+
+```ts
+function readCookie(name: string) {
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith(`${name}=`))
+    ?.split("=")[1];
+}
+
+const csrfToken = readCookie("csrf_token");
+
+if (csrfToken) {
+  config.headers["X-CSRF-Token"] = decodeURIComponent(csrfToken);
+}
+```
+
+Example backend checks cookie and header:
+
+```py
+from fastapi import Cookie, Header, HTTPException
+
+
+def verify_csrf_token(
+    csrf_cookie: str | None = Cookie(default=None, alias="csrf_token"),
+    csrf_header: str | None = Header(default=None, alias="X-CSRF-Token"),
+) -> None:
+    if csrf_cookie is None or csrf_header is None or csrf_cookie != csrf_header:
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+```
+
+Example route uses the CSRF check:
+
+```py
+from fastapi import Depends
+
+
+@router.post("/referrals", dependencies=[Depends(verify_csrf_token)])
+def create_referral():
+    return {"message": "referral created"}
+```
+
+Flow with values:
+
+```txt
+Cookie:
+csrf_token=abc123
+
+Header:
+X-CSRF-Token: abc123
+
+Result:
+allowed
+```
+
+Bad request:
+
+```txt
+Cookie:
+csrf_token=abc123
+
+Header:
+missing
+
+Result:
+blocked
+```
+
+Tiny version:
+
+```txt
+Access token proves the user.
+CSRF token proves the write request.
+```
+
+The real project uses this same JWT cookie idea, plus extra safety around roles
+and CSRF.
